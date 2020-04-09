@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web:
+    build: .
+    environment:
+      SHEET_ID: 1n9Q_079bXaRNxNjiBr4MOYVVEPagqaFNQSyKUYM6UCY
+    ports:
+      - "5000:3001"
