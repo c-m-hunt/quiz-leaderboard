@@ -12,10 +12,12 @@ let quizData;
 const startApp = () => {
   const app = express();
   app.use(cors())
+
+  const refreshTime = process.env['REFRESH_TIME'] ? parseInt(process.env['REFRESH_TIME']) : 60000;
   setInterval(async() => {
     console.log("Getting quiz data")
     quizData = await getQuizData();
-  }, 50000);
+  }, refreshTime);
 
   app.use(expressWinston.logger({
     transports: [
