@@ -1,8 +1,21 @@
 version: '3'
 services:
   web:
-    build: .
+    image: 811771737115.dkr.ecr.eu-west-1.amazonaws.com/quiz-leaderboard
     environment:
       SHEET_ID: 1n9Q_079bXaRNxNjiBr4MOYVVEPagqaFNQSyKUYM6UCY
-    ports:
-      - "5000:3001"
+      REFRESH_TIME: 10000
+      QUIZ_TITLE: Thursday Night Quiz - Leaderboard
+      VIRTUAL_HOST: quiz.chris-hunt.net
+      VIRTUAL_PORT: 3001
+      LETSENCRYPT_HOST: quiz.chris-hunt.net
+      LETSENCRYPT_EMAIL: chris.hunt1977@gmail.com
+    expose:
+      - "3001"
+    volumes:
+      - ${PWD}/privatekey.json /usr/app/src/privatekey.json
+    restart: always
+networks:
+  default:
+    external:
+      name: webproxy
