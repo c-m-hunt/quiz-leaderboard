@@ -1,0 +1,16 @@
+th.rotated-text {
+  height: 140px;
+  white-space: nowrap;
+  padding: 0 !important;
+}
+
+th.rotated-text > div {
+  transform:
+      translate(13px, 0px)
+      rotate(310deg);
+  width: 30px;
+}
+
+th.rotated-text > div > span {
+  padding: 5px 10px;
+}
