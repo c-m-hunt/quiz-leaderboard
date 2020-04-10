@@ -14,3 +14,7 @@ th.rotated-text > div {
 th.rotated-text > div > span {
   padding: 5px 10px;
 }
+
+.joker-round {
+  border: 3px solid orange !important;
+}

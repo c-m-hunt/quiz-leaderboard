@@ -2,6 +2,7 @@ import React from 'react';
 export interface ITeam {
   teamName: string;
   captain: string;
+  joker: string | null;
   scores: {
     [key: string]: null | number; 
   },
@@ -95,6 +96,9 @@ export default class Leaderboard extends React.PureComponent<Props, State> {
                   }
                   if (team.scores[round] && roundMinMax[round].max === team.scores[round]) {
                     css += ' table-success';
+                  }
+                  if (team.joker === round) {
+                    css += ' joker-round'
                   }
                   return <td key={`${team.teamName}-${round}`}className={`text-center ${css}`}>{team.scores[round]}</td>
                 }) }
