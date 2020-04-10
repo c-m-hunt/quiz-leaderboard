@@ -19,11 +19,11 @@ export const getQuizData = async () => {
       teamName: row['Team Name'],
       captain: row['Captain'] || null,
       scores: rounds.reduce((teamScores, round) => {
-        teamScores[round] = parseInt(row[round]) || null;
+        teamScores[round] = parseFloat(row[round]) || null;
         return teamScores
       }, {}),
       total: rounds.reduce((score, round) => {
-        return score + (row[round] ? parseInt(row[round]) : 0)
+        return score + (row[round] ? parseFloat(row[round]) : 0)
       }, 0)
     }
   });
