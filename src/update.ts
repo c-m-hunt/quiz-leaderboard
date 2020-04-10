@@ -12,7 +12,7 @@ export const getQuizData = async () => {
   await sheet.loadHeaderRow();
   const totalColIdx = sheet.headerValues.indexOf('Total');
   const rounds = sheet.headerValues.filter((round, i) => i >= 2 && i < totalColIdx);  
-  const rows = await sheet.getRows({offset: 0, limit: 20});
+  const rows = await sheet.getRows({offset: 0, limit: 50});
 
   let teams = rows.filter(row => row['Team Name'] !== '').map(row => {
     return {
