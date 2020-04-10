@@ -12,16 +12,20 @@ export const getQuizData = async () => {
   await sheet.loadHeaderRow();
 
   const joker = 'Joker';
+  const captain = 'Captain';
+  const total = 'Total';
+  const teamName = 'Team Name';
 
-  const totalColIdx = sheet.headerValues.indexOf('Total');
+  const totalColIdx = sheet.headerValues.indexOf(total);
+  const captainColIdx = sheet.headerValues.indexOf(captain);
   const jokerIncluded = sheet.headerValues.includes(joker);
-  const roundsStartCol = jokerIncluded ? 3 : 2;
-  const rounds = sheet.headerValues.filter((round, i) => i >= roundsStartCol && i < totalColIdx);  
+  const roundsStartIdx = jokerIncluded ? sheet.headerValues.indexOf(joker) + 1 : captainColIdx + 1;
+  const rounds = sheet.headerValues.filter((round, i) => i >= roundsStartIdx && i < totalColIdx);  
   const rows = await sheet.getRows({offset: 0, limit: 50});
-  let teams = rows.filter(row => row['Team Name'] !== '').map(row => {
+  let teams = rows.filter(row => row[teamName] !== '').map(row => {
     return {
-      teamName: row['Team Name'],
-      captain: row['Captain'] || null,
+      teamName: row[teamName],
+      captain: row[captain] || null,
       joker: jokerIncluded ? row[joker] : null,
       scores: rounds.reduce((teamScores, round) => {
         teamScores[round] = parseFloat(row[round]) || null;
