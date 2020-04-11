@@ -23,7 +23,7 @@ const startApp = () => {
   logger.debug('Setting up server');
 
   setInterval(async() => {
-    quizData = await getQuizData(sheetId);
+    quizData = await getQuizData(docId);
   }, refreshTime);
 
   app.use(expressWinston.logger({
