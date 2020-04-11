@@ -1,4 +1,4 @@
-import logger from './logger';
+import logger from '../logger';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -19,5 +19,5 @@ export const getCreds = (): string => {
   if (!fs.existsSync(keyPath)) {
     throw new Error('Could not find Google Service Account key');
   }
-  return keyPath
+  return keyPath;
 }

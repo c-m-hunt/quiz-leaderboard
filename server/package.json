@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/node": "^13.11.0",
+    "@types/yargs": "^15.0.4",
     "bootstrap": "^4.4.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -18,7 +19,8 @@
     "ts-node": "^8.8.2",
     "typescript": "^3.8.3",
     "underscore": "^1.10.2",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "yargs": "^15.3.1"
   },
   "scripts": {
     "start": "ts-node ./src/index.ts",
