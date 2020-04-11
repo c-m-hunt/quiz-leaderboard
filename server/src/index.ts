@@ -7,9 +7,9 @@ import { getQuizData } from './update';
 
 const port = 3001;
 const cors = require('cors')
-const sheetId = process.env['SHEET_ID'];
-if (!sheetId) {
-  throw Error('No sheet ID set');
+const docId = process.env['DOC_ID'];
+if (!docId) {
+  throw Error('No doc ID set');
 }
 let quizData;
 
@@ -50,7 +50,7 @@ const startApp = () => {
   });
 }
 
-getQuizData(sheetId)
+getQuizData(docId)
   .then(data => {
     quizData = data;
     startApp();

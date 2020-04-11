@@ -1,6 +1,8 @@
+#!/usr/bin/env ts-node
+
 import yargs from 'yargs';
 import logger from './logger';
-import { getDoc } from './googleSheets/sheets';
+import { getDoc, getSheetByTitle } from './googleSheets/sheets';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import * as fields from './quiz/fields';
 
@@ -27,17 +29,20 @@ logger.info(`Key        ${options.key}`)
 const setupSheet = async (options) => {
   const doc = await getDoc(`${options.sheetid}`);
   let sheet: GoogleSpreadsheetWorksheet | null = null;
-  for (let checkSheet of doc.sheetsByIndex) {
-    if (checkSheet.title === options.tab) {
-      if (!options.force) {
-        const errMsg = `Tab ${options.tab} exists. Either delete this tab, change the name or set the -f flag`;
-        logger.error(errMsg);
-        throw Error(errMsg);
-      }
-      sheet = checkSheet;
-      await sheet.clear()
-    }
+  try {
+    sheet = getSheetByTitle(options.tab, doc);
+  } catch (ex) {
+    // Yay - doesn't exist
   }
+  if (!options.force && sheet) {
+    const errMsg = `Tab ${options.tab} exists. Either delete this tab, change the name or set the -f flag`;
+    logger.error(errMsg);
+    throw Error(errMsg);
+  }
+  if (options.force && sheet) {
+    await sheet.clear()
+  }
+
   if (!sheet) {
     sheet = await doc.addSheet({ title: `${options.tab}` });
   }

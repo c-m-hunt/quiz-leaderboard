@@ -1,15 +1,23 @@
 import { sortBy } from 'underscore';
+import { GoogleSpreadsheetSheet } from 'google-spreadsheet';
 import logger from './logger';
 import * as fields from './quiz/fields';
-import { getDoc } from './googleSheets/sheets';
+import { getDoc, getSheetByTitle } from './googleSheets/sheets';
 
-export const getQuizData = async (sheetId) => {
+export const getQuizData = async (docId: string, tab?: string) => {
   logger.info('--------------------');
   logger.info('UPDATING QUIZ DATA');
   logger.info('--------------------');
   logger.debug('Getting creds');
-  const doc = await getDoc(sheetId);
-  const sheet = doc.sheetsByIndex[0]; // or use doc.sheetsById[id]
+  const doc = await getDoc(docId);
+  let sheet: GoogleSpreadsheetSheet | null = null;
+  if (tab) {
+    sheet = getSheetByTitle(tab, doc);
+  }
+  if (!sheet) {
+    sheet = doc.sheetsByIndex[0];
+  }
+ 
   await sheet.loadHeaderRow();
 
   const totalColIdx = sheet.headerValues.indexOf(fields.total);

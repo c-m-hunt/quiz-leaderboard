@@ -25,5 +25,8 @@
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "watch": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'ts-node' ./src/index.ts"
+  },
+  "bin": {
+    "quiz_setup": "src/setup.ts"
   }
 }
