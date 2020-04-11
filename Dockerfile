@@ -5,7 +5,7 @@ WORKDIR /usr/app/ui
 RUN yarn install
 
 FROM node:13-slim AS server-build
-COPY package.json /usr/app/package.json
+COPY server/package.json /usr/app/package.json
 WORKDIR /usr/app/src
 RUN yarn install
 
@@ -19,9 +19,9 @@ FROM node:13-slim
 COPY --from=ui-build /usr/app/ui/build /usr/app/ui/build
 COPY --from=server-build /usr/app/node_modules /usr/app/node_modules
 
-COPY package.json /usr/app
-COPY tsconfig.json /usr/app
-COPY src /usr/app/src
+COPY server/package.json /usr/app
+COPY server/tsconfig.json /usr/app
+COPY server/src /usr/app/src
 
 WORKDIR /usr/app
 CMD ["yarn", "start"]

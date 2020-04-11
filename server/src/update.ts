@@ -1,13 +1,15 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { sortBy } from 'underscore';
+import logger from './logger';
 
-const sheetId = process.env['SHEET_ID'];
+import { getDoc } from './sheets';
 
-export const getQuizData = async () => {
-  const googleCreds = require('./privatekey.json');
-  const doc = new GoogleSpreadsheet(sheetId);
-  await doc.useServiceAccountAuth(googleCreds);
-  await doc.loadInfo();
+export const getQuizData = async (sheetId) => {
+  logger.info('--------------------');
+  logger.info('UPDATING QUIZ DATA');
+  logger.info('--------------------');
+  logger.debug('Getting creds');
+  const doc = await getDoc(sheetId);
   const sheet = doc.sheetsByIndex[0]; // or use doc.sheetsById[id]
   await sheet.loadHeaderRow();
 
@@ -19,8 +21,13 @@ export const getQuizData = async () => {
   const totalColIdx = sheet.headerValues.indexOf(total);
   const captainColIdx = sheet.headerValues.indexOf(captain);
   const jokerIncluded = sheet.headerValues.includes(joker);
+  if (jokerIncluded) {
+    logger.debug('The quiz does have a joker');
+  }
   const roundsStartIdx = jokerIncluded ? sheet.headerValues.indexOf(joker) + 1 : captainColIdx + 1;
   const rounds = sheet.headerValues.filter((round, i) => i >= roundsStartIdx && i < totalColIdx);  
+  logger.debug(`We are loading in the following rounds:`)
+  logger.debug(`${rounds.join(', ')}`);
   const rows = await sheet.getRows({offset: 0, limit: 50});
   let teams = rows.filter(row => row[teamName] !== '').map(row => {
     return {
@@ -39,7 +46,7 @@ export const getQuizData = async () => {
     team.total = Object.values(team.scores).reduce((totalScore: number, score: number) => totalScore + score, 0)
     return team;
   })
-
+  logger.debug(`We have found ${teams.length} teams`);
   teams = sortBy(teams, team => team.total).reverse();
   const quiz = {
     rounds, teams,

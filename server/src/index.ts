@@ -1,12 +1,16 @@
 import expressWinston from "express-winston";
-import winston from "winston";
+import logger from './logger';
 import express from "express";
 import path from 'path';
 
 import { getQuizData } from './update';
 
 const port = 3001;
-const  cors = require('cors')
+const cors = require('cors')
+const sheetId = process.env['SHEET_ID'];
+if (!sheetId) {
+  throw Error('No sheet ID set');
+}
 let quizData;
 
 const startApp = () => {
@@ -14,15 +18,17 @@ const startApp = () => {
   app.use(cors())
 
   const refreshTime = process.env['REFRESH_TIME'] ? parseInt(process.env['REFRESH_TIME']) : 60000;
+  logger.info(`Refresh time set to ${refreshTime / 1000} seconds`);
+
+  logger.debug('Setting up server');
+
   setInterval(async() => {
-    console.log("Getting quiz data")
-    quizData = await getQuizData();
+    quizData = await getQuizData(sheetId);
   }, refreshTime);
 
   app.use(expressWinston.logger({
-    transports: [
-      new winston.transports.Console(),
-    ],
+    transports: logger.transports,
+    format: logger.format,
     meta: true,
     msg: "HTTP {{req.method}} {{req.url}}",
     expressFormat: true,
@@ -40,11 +46,11 @@ const startApp = () => {
   });
   
   app.listen(port, () => {
-    winston.info("App listening on port " + port);
+    logger.info("App listening on port " + port);
   });
 }
 
-getQuizData()
+getQuizData(sheetId)
   .then(data => {
     quizData = data;
     startApp();
