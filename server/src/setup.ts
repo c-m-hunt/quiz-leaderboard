@@ -1,32 +1,109 @@
 #!/usr/bin/env ts-node
 
-import yargs from 'yargs';
+import inquirer, { QuestionCollection } from 'inquirer';
+import clear from 'clear';
+import { promisify } from 'util';
+import figlet from 'figlet';
 import logger from './logger';
 import { getDoc, getSheetByTitle } from './googleSheets/sheets';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import * as fields from './quiz/fields';
 
-const options = yargs
-  .usage('Usage: -r <numberOfRounds')
-  .option('s', {alias: 'sheetid', describe: 'Google Sheets ID', type: 'string', demandOption: true})
-  .option('r', {alias: 'rounds', describe: 'Number of rounds', type: 'number', demandOption: true})
-  .option('j', {alias: 'joker', describe: 'Include Joker', type: 'boolean', default: false})
-  .option('f', {alias: 'force', describe: 'Force overwriting an existing sheet. Will throw error if sheet exists and this flag is not set', type: 'boolean', default: false })
-  .option('t', {alias: 'tab', describe: 'Name of the tab on the sheet', type: 'string', default: 'Quiz Results'})
-  .option('m', {alias: 'maxteams', describe: 'Max teams', type: 'number', default: 30 })
-  .option('k', {alias: 'key', describe: 'Google Service Key location', type: 'string', default: null })
-  .argv;
+const figletProm = promisify(figlet);
 
-logger.info('Setting up spreadsheet');
-logger.info('----------------------');
-logger.info(`Sheet ID   ${options.sheetid}`);
-logger.info(`Tab name   ${options.tab}`);
-logger.info(`Rounds     ${options.rounds}`);
-logger.info(`Joker      ${options.joker}`)
-logger.info(`Key        ${options.key}`)
-
+const getOptions = async() => {
+  const title = await figletProm('Quiz Setup');
+  console.log(title);
+  const questions: QuestionCollection = [{
+    type: 'input',
+    name: 'sheetid',
+    message: 'Enter the ID for the Google Sheets doc',
+    validate: (value) => {
+      if (value.length < 10) {
+        return 'Please ensure the ID is at least 10 characters';
+      }
+      return true;
+    },
+    filter: value => value.trim()
+  },{
+    type: 'input',
+    name: 'tab',
+    message: 'Enter the table name for the quiz',
+    validate: (value) => {
+      if (value.length < 3) {
+        return 'Ensure that the tab name is at least 3 characters';
+      }
+      return true;
+    },
+    default: 'Quiz Results'
+  },{
+    type: 'confirm',
+    name: 'force',
+    message: 'Overwrite tab contents if tab exists?',
+    default: false
+  },{
+    type: 'number',
+    name: 'rounds',
+    message: 'How many rounds are you planning? (This can be changed later)',
+    validate: (value) => {
+      if (!Number.isInteger(parseFloat(value))) {
+        return 'Please enter a valid number';
+      }
+      if (value < 1) {
+        return 'There must be at least one round';
+      }
+      if (value > 20) {
+        return 'Max rounds 20'
+      }
+      return true;
+    },
+    default: 5
+  },{
+    type: 'number',
+    name: 'maxTeams',
+    message: 'What is the maximum amount of teams?',
+    validate: (value) => {
+      if (!Number.isInteger(parseFloat(value))) {
+        return 'Please enter a valid number';
+      }
+      if (value < 1) {
+        return 'There must be at least one tea,';
+      }
+      if (value > 50) {
+        return 'Max rounds 50'
+      }
+      return true;
+    },
+    default: 20
+  },{
+    type: 'confirm',
+    name: 'joker',
+    message: 'Are teams going to be using a joker?',
+    default: false
+  },{
+    type: 'input',
+    name: 'key',
+    message: 'Where is the location of Google Service Account key? Leave blank for auto search',
+    default: null,
+    filter: (value) => {
+      if (value === '') {
+        return null
+      }
+      return value;
+    }
+  }]
+  const answers = await inquirer.prompt(questions);
+  return answers;
+}
 
 const setupSheet = async (options) => {
+  logger.info('Setting up spreadsheet');
+  logger.info('----------------------');
+  logger.info(`Sheet ID   ${options.sheetid}`);
+  logger.info(`Tab name   ${options.tab}`);
+  logger.info(`Rounds     ${options.rounds}`);
+  logger.info(`Joker      ${options.joker}`)
+  logger.info(`Key        ${options.key}`)
   const doc = await getDoc(`${options.sheetid}`);
   let sheet: GoogleSpreadsheetWorksheet | null = null;
   try {
@@ -61,7 +138,7 @@ const setupSheet = async (options) => {
     }
     const headers = [ ...coreHeaders, ...dummyRounds, fields.total ];
     await sheet.setHeaderRow(headers);
-    const cellRange = `A1:${numberToLetter(headers.length - 1)}${options.maxteams}`;
+    const cellRange = `A1:${numberToLetter(headers.length - 1)}${options.maxTeams}`;
     await sheet.loadCells(cellRange);
     // Set header formatting
     for (let i = 0; i < headers.length; i++) {
@@ -70,7 +147,7 @@ const setupSheet = async (options) => {
       cell.borders = { bottom: { width: 1, style: 3 } };
     }
     // Set team formatting
-    for (let i = 0; i < options.maxteams; i++) {
+    for (let i = 0; i < options.maxTeams; i++) {
       const cell1 = sheet.getCell(i, coreHeaders.length - 1);
       let borders = { right: { width: 1, style: 3 } }
       if (i === 0) {
@@ -99,4 +176,8 @@ const numberToLetter = (number: number): string => {
   return String.fromCharCode(65 + number)
 }
 
-setupSheet(options);
+clear();
+getOptions()
+  .then(options => {
+    setupSheet(options);
+  });
