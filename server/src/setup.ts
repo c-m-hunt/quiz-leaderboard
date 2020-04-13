@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 
 import inquirer, { QuestionCollection } from 'inquirer';
 import clear from 'clear';

@@ -1,6 +1,7 @@
 .idea
 
 */**/node_modules
+*/**/dist
 start.sh
 
 */**/privatekey.json

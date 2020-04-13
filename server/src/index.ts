@@ -17,9 +17,10 @@ const startApp = () => {
   const app = express();
   app.use(cors())
 
-  const refreshTime = process.env['REFRESH_TIME'] ? parseInt(process.env['REFRESH_TIME']) : 60000;
-  logger.info(`Refresh time set to ${refreshTime / 1000} seconds`);
+  // @ts-ignore
+  const refreshTime: number = process.env['REFRESH_TIME'] ? parseInt(process.env['REFRESH_TIME']) : 60000;
 
+  logger.info(`Refresh time set to ${refreshTime / 1000} seconds`);
   logger.debug('Setting up server');
 
   setInterval(async() => {
