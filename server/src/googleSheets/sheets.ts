@@ -15,7 +15,7 @@ export const getDoc = async(id: string, creds?: string): Promise<GoogleSpreadshe
 }
 
 export const getSheetByTitle = (title: string, doc: GoogleSpreadsheet): GoogleSpreadsheetSheet | null => {
-  for (let sheet of doc.sheetsByIndex) {
+  for (const sheet of doc.sheetsByIndex) {
     if (sheet.title === title) {
       return sheet;
     }

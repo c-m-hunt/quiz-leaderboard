@@ -4,7 +4,21 @@ import logger from './logger';
 import * as fields from './quiz/fields';
 import { getDoc, getSheetByTitle } from './googleSheets/sheets';
 
-export const getQuizData = async (docId: string, tab?: string) => {
+interface Team {
+  teamName: string;
+  captain: string;
+  scores: { [key: string]: number };
+  joker: string;
+  total?: number;
+}
+
+interface Quiz {
+  rounds: Team[];
+  title: string;
+  refreshTime: number;
+}
+
+export const getQuizData = async (docId: string, tab?: string): Promise<Quiz> => {
   logger.info('--------------------');
   logger.info('UPDATING QUIZ DATA');
   logger.info('--------------------');
@@ -52,8 +66,8 @@ export const getQuizData = async (docId: string, tab?: string) => {
   teams = sortBy(teams, team => team.total).reverse();
   const quiz = {
     rounds, teams,
-    title: process.env['QUIZ_TITLE'],
-    refreshTime: process.env['REFRESH_TIME']
+    title: process.env['QUIZ_TITLE'] || 'Quiz Leaderboard',
+    refreshTime: process.env['REFRESH_TIME'] ? parseInt(process.env['REFRESH_TIME']) : 60000
   }
   return quiz;
 }

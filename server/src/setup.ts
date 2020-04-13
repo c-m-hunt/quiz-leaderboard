@@ -9,27 +9,41 @@ import { getDoc, getSheetByTitle } from './googleSheets/sheets';
 import { GoogleSpreadsheetWorksheet } from 'google-spreadsheet';
 import * as fields from './quiz/fields';
 
+interface Options {
+  sheetid: string;
+  tab: string;
+  force: boolean;
+  rounds: number;
+  maxTeams: number;
+  joker: boolean;
+  key: string | null;
+}
+
 const figletProm = promisify(figlet);
 
-const getOptions = async() => {
+const numberToLetter = (number: number): string => {
+  return String.fromCharCode(65 + number)
+}
+
+const getOptions = async(): Promise<Options> => {
   const title = await figletProm('Quiz Setup');
   console.log(title);
   const questions: QuestionCollection = [{
     type: 'input',
     name: 'sheetid',
     message: 'Enter the ID for the Google Sheets doc',
-    validate: (value) => {
+    validate: (value): string | boolean => {
       if (value.length < 10) {
         return 'Please ensure the ID is at least 10 characters';
       }
       return true;
     },
-    filter: value => value.trim()
+    filter: (value): string => value.trim()
   },{
     type: 'input',
     name: 'tab',
     message: 'Enter the table name for the quiz',
-    validate: (value) => {
+    validate: (value): string | boolean => {
       if (value.length < 3) {
         return 'Ensure that the tab name is at least 3 characters';
       }
@@ -45,7 +59,7 @@ const getOptions = async() => {
     type: 'number',
     name: 'rounds',
     message: 'How many rounds are you planning? (This can be changed later)',
-    validate: (value) => {
+    validate: (value): string | boolean => {
       if (!Number.isInteger(parseFloat(value))) {
         return 'Please enter a valid number';
       }
@@ -62,7 +76,7 @@ const getOptions = async() => {
     type: 'number',
     name: 'maxTeams',
     message: 'What is the maximum amount of teams?',
-    validate: (value) => {
+    validate: (value): string | boolean => {
       if (!Number.isInteger(parseFloat(value))) {
         return 'Please enter a valid number';
       }
@@ -85,18 +99,19 @@ const getOptions = async() => {
     name: 'key',
     message: 'Where is the location of Google Service Account key? Leave blank for auto search',
     default: null,
-    filter: (value) => {
+    filter: (value): string | null => {
       if (value === '') {
         return null
       }
       return value;
     }
   }]
-  const answers = await inquirer.prompt(questions);
+  //@ts-ignore
+  const answers: Options = await inquirer.prompt(questions);
   return answers;
 }
 
-const setupSheet = async (options) => {
+const setupSheet = async (options: Options): void => {
   logger.info('Setting up spreadsheet');
   logger.info('----------------------');
   logger.info(`Sheet ID   ${options.sheetid}`);
@@ -128,7 +143,7 @@ const setupSheet = async (options) => {
     for (let i = 0; i < options.rounds; i++) {
       dummyRounds.push(`Round ${i+1}`);
     }
-    let coreHeaders = [
+    const coreHeaders = [
       fields.teamName,
       fields.notes,
       fields.captain,
@@ -149,7 +164,7 @@ const setupSheet = async (options) => {
     // Set team formatting
     for (let i = 0; i < options.maxTeams; i++) {
       const cell1 = sheet.getCell(i, coreHeaders.length - 1);
-      let borders = { right: { width: 1, style: 3 } }
+      const borders = { right: { width: 1, style: 3 } }
       if (i === 0) {
         borders['bottom'] = { width: 1, style: 3 };
       }
@@ -157,7 +172,7 @@ const setupSheet = async (options) => {
       cell1.borders = borders;
       if (i > 0) {
         const cellTotal = sheet.getCell(i, headers.length - 1);
-        let totalBorders = { left: { width: 1, style: 3 } }
+        const totalBorders = { left: { width: 1, style: 3 } }
         if (i === 0) {
           totalBorders['bottom'] = { width: 1, style: 3 };
         }
@@ -170,10 +185,6 @@ const setupSheet = async (options) => {
     await sheet.saveUpdatedCells();
     logger.info('Spreadsheet set up');
   }
-}
-
-const numberToLetter = (number: number): string => {
-  return String.fromCharCode(65 + number)
 }
 
 clear();

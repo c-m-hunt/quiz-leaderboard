@@ -2,18 +2,18 @@ import expressWinston from "express-winston";
 import logger from './logger';
 import express from "express";
 import path from 'path';
+import cors from 'cors';
 
 import { getQuizData } from './update';
 
 const port = 3001;
-const cors = require('cors')
 const docId = process.env['DOC_ID'];
 if (!docId) {
   throw Error('No doc ID set');
 }
 let quizData;
 
-const startApp = () => {
+const startApp = (): void => {
   const app = express();
   app.use(cors())
 
