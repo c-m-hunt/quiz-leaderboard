@@ -15,14 +15,9 @@ npm install -g .
 ```
 ### Run the setup script
 ```
-quiz_setup -s 1n9Q_079bXaRNxNjiBr4MOYVVEPagqaFNQSyKUYM6UCY -t "My Quiz" -r 5 -j -f
+quiz_setup
 ```
-#### Options
-* `-s` Sheet ID
-* `-t` Tab name
-* `-r` Number of rounds
-* `-j` Switch - whether there will be a joker round
-* `-f` Switch - overwrite the tab if it already exists
+and answer the questions on the prompts
 
 ## Run the leaderboard
 Amend the parameters in `docker-compose.yaml` and simply run `docker-compose up -d`. The scoreboard will be available on the port you've mapped.
