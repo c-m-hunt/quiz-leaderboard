@@ -51,7 +51,7 @@ export const getQuizData = async (docId: string, tab?: string): Promise<Quiz> =>
       captain: row[fields.captain] || null,
       joker: jokerIncluded ? row[fields.joker] : null,
       scores: rounds.reduce((teamScores, round) => {
-        teamScores[round] = parseFloat(row[round]);
+        teamScores[round] = row[round].trim().length > 0 ? parseFloat(row[round]) : null;
         teamScores[round] = teamScores[round] && row[fields.joker] === round ? teamScores[round] * 2 : teamScores[round];
         return teamScores
       }, {}),
@@ -59,7 +59,9 @@ export const getQuizData = async (docId: string, tab?: string): Promise<Quiz> =>
   });
 
   teams = teams.map(team => {
-    team.total = Object.values(team.scores).reduce((totalScore: number, score: number) => totalScore + score, 0)
+    team.total = Object.values(team.scores)
+      .filter(s => s !== null)
+      .reduce((totalScore: number, score: number) => totalScore + score, 0)
     return team;
   })
   logger.debug(`We have found ${teams.length} teams`);
