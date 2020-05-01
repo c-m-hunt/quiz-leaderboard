@@ -1,12 +1,13 @@
 FROM node:13-slim AS ui-install
-
 COPY ui/package.json /usr/app/ui/package.json
+COPY ui/yarn.lock /usr/app/ui/yarn.lock
 WORKDIR /usr/app/ui
 RUN yarn install
 
 FROM node:13-slim AS server-build
 COPY server/package.json /usr/app/package.json
-WORKDIR /usr/app/src
+COPY server/yarn.lock /usr/app/yarn.lock
+WORKDIR /usr/app
 RUN yarn install
 
 FROM node:13-slim AS ui-build

@@ -111,7 +111,7 @@ const getOptions = async(): Promise<Options> => {
   return answers;
 }
 
-const setupSheet = async (options: Options): void => {
+const setupSheet = async (options: Options): Promise<void> => {
   logger.info('Setting up spreadsheet');
   logger.info('----------------------');
   logger.info(`Sheet ID   ${options.sheetid}`);

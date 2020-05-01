@@ -17,8 +17,7 @@
   },
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "watch": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'ts-node' ./src/index.ts",
-    "preinstall": "yarn build",
+    "watch": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'node --inspect -r ts-node/register' ./src/index.ts",
     "lint": "eslint ./src --ext ts",
     "build": "tsc -p ."
   },

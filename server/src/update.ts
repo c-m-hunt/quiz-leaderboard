@@ -51,7 +51,7 @@ export const getQuizData = async (docId: string, tab?: string): Promise<Quiz> =>
       captain: row[fields.captain] || null,
       joker: jokerIncluded ? row[fields.joker] : null,
       scores: rounds.reduce((teamScores, round) => {
-        teamScores[round] = parseFloat(row[round]) || null;
+        teamScores[round] = parseFloat(row[round]);
         teamScores[round] = teamScores[round] && row[fields.joker] === round ? teamScores[round] * 2 : teamScores[round];
         return teamScores
       }, {}),
